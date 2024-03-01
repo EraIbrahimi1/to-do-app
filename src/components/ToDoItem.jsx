@@ -1,13 +1,31 @@
-import { Box, Checkbox, Typography, Button } from "@mui/joy";
+import React, { useState } from "react";
+import { Box, Checkbox, Typography, Button, Input } from "@mui/joy";
 
 const TodoItem = ({
   task,
   dueDate,
   isDone,
-  onHandleToggleDone,
   onHandleDeleteItem,
-  handleEditClick,
+  onHandleEditItem,
+  handleToggleDone,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTask, setEditedTask] = useState(task);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    onHandleEditItem(editedTask, isDone);
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedTask(task);
+  };
+
   return (
     <Box
       display="flex"
@@ -18,27 +36,59 @@ const TodoItem = ({
     >
       <Checkbox
         checked={isDone}
+        onChange={handleToggleDone}
         color={isDone ? "success" : "primary"}
-        onChange={onHandleToggleDone}
-        readOnly
       />
 
       <Box borderRight="1px solid #ccc" height="50%" mx={1} my={0.5} />
 
       <Box flex={1} marginLeft={2} marginRight={2}>
-        <Typography variant="plain" color={isDone ? "success" : "primary"}>
-          <span style={{ textDecoration: isDone ? "line-through" : "" }}>
-            {task}
-          </span>
-        </Typography>
-        {!isDone && (
+        {isEditing ? (
+          <Input
+            color="primary"
+            variant="soft"
+            value={editedTask}
+            onChange={(e) => setEditedTask(e.target.value)}
+          />
+        ) : (
+          <Typography variant="plain" color={isDone ? "success" : "primary"}>
+            <span style={{ textDecoration: isDone ? "line-through" : "" }}>
+              {task}
+            </span>
+          </Typography>
+        )}
+        {!isDone && !isEditing && (
           <Typography variant="plain" color="primary">
             Due: {dueDate}
           </Typography>
         )}
       </Box>
 
-      <Box>
+      {isEditing ? (
+        <Box marginLeft={2} display="flex">
+          <Box marginRight={1}>
+            <Button
+              variant="soft"
+              size="sm"
+              color="primary"
+              onClick={handleSaveEdit}
+              style={{ marginLeft: "5px" }}
+            >
+              Save
+            </Button>
+          </Box>
+          <Box>
+            <Button
+              variant="soft"
+              size="sm"
+              color="primary"
+              onClick={handleCancelEdit}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      ) : (
         <Button
           variant="soft"
           size="sm"
@@ -47,8 +97,7 @@ const TodoItem = ({
         >
           🖊️
         </Button>
-      </Box>
-
+      )}
       <Box marginLeft={2}>
         <Button
           variant="soft"

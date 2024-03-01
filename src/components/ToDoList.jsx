@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import TodoItem from "./ToDoItem";
 
-function ToDoList({ todoItems, onHandleToggleDone }) {
+function ToDoList({
+  todoItems,
+  onHandleDeleteItem,
+  onHandleEditItem,
+  handleToggleDone,
+}) {
   const [sortedItems, setSortedItems] = useState([]);
 
-  const checkedTasks = sortedItems.filter((task) => task.isDone);
-  const uncheckedTasks = sortedItems.filter((task) => !task.isDone);
   useEffect(() => {
-    setSortedItems([...todoItems]);
+    const sorted = [...todoItems].sort(
+      (a, b) => Number(a.isDone) - Number(b.isDone)
+    );
+    setSortedItems(sorted);
   }, [todoItems]);
 
   const renderTasks = (tasks) => {
@@ -17,15 +23,22 @@ function ToDoList({ todoItems, onHandleToggleDone }) {
         task={item.task}
         dueDate={item.dueDate}
         isDone={item.isDone}
-        onHandleToggleDone={() => onHandleToggleDone(item.id)}
+        onHandleDeleteItem={() => onHandleDeleteItem(item.id)}
+        onHandleEditItem={(editedTask, isDone) =>
+          onHandleEditItem(item.id, editedTask, isDone)
+        }
+        handleToggleDone={() => handleToggleDone(item.id)}
       />
     ));
   };
 
+  const completedTasks = sortedItems.filter((task) => task.isDone);
+  const remainingTasks = sortedItems.filter((task) => !task.isDone);
+
   return (
     <div>
-      <div>{renderTasks(uncheckedTasks)}</div>
-      <div>{renderTasks(checkedTasks)}</div>
+      <div>{renderTasks(remainingTasks)}</div>
+      <div>{renderTasks(completedTasks)}</div>
     </div>
   );
 }

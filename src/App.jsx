@@ -3,6 +3,7 @@ import { Divider } from "@mui/joy";
 import Header from "./components/Header";
 import Form from "./components/Form";
 import ToDoList from "./components/ToDoList";
+
 function App() {
   const [todoItems, setTodoItems] = useState([]);
 
@@ -11,12 +12,36 @@ function App() {
     setTodoItems([...todoItems, newItemWithId]);
   };
 
+  const handleDeleteItem = (itemId) => {
+    const updatedItems = todoItems.filter((item) => item.id !== itemId);
+    setTodoItems(updatedItems);
+  };
+
+  const handleEditItem = (itemId, editedTask, isDone) => {
+    const updatedItems = [...todoItems];
+    const index = updatedItems.findIndex((item) => item.id === itemId);
+
+    if (index !== -1) {
+      updatedItems[index] = {
+        ...updatedItems[index],
+        task: editedTask,
+        isDone: isDone,
+      };
+      setTodoItems(updatedItems);
+    }
+  };
+
   const handleToggleDone = (itemId) => {
-    setTodoItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === itemId ? { ...item, isDone: !item.isDone } : item
-      )
-    );
+    const updatedItems = [...todoItems];
+    const index = updatedItems.findIndex((item) => item.id === itemId);
+
+    if (index !== -1) {
+      updatedItems[index] = {
+        ...updatedItems[index],
+        isDone: !updatedItems[index].isDone,
+      };
+      setTodoItems(updatedItems);
+    }
   };
 
   return (
@@ -44,7 +69,9 @@ function App() {
         >
           <ToDoList
             todoItems={todoItems}
-            onHandleToggleDone={handleToggleDone}
+            onHandleDeleteItem={handleDeleteItem}
+            onHandleEditItem={handleEditItem}
+            handleToggleDone={handleToggleDone}
           />
         </div>
       </div>
